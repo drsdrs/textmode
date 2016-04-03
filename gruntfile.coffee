@@ -31,7 +31,7 @@ module.exports = (grunt) ->
       client:
         options:
           join: true
-          bare: true
+          #bare: true
           sourceMap: true
         files:
           'dist/index.js': 'src/coffee/**/*.coffee'
