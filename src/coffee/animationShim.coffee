@@ -3,12 +3,7 @@
 
 do ->
   lastTime = 0
-  vendors = [
-    'ms'
-    'moz'
-    'webkit'
-    'o'
-  ]
+  vendors = [ 'ms', 'moz', 'webkit', 'o' ]
   x = 0
   while x < vendors.length and !window.requestAnimationFrame
     window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame']

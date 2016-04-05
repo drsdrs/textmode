@@ -1,3 +1,4 @@
+
 @font-face {
   font-family: 'c64';
   src: url('fonts/C64_Pro_Mono-STYLE.ttf') format('truetype');
@@ -320,25 +321,27 @@ textarea {
 html,
 body {
   height: 100%;
+  width: 100%;
   overflow: hidden;
+  cursor: none;
 }
 #textmode_wrap {
-  background: #6076c5;
+  background: #0088FF;
   font-family: 'c64';
-  text-rendering: geometricPrecision;
 }
 #textmode_wrap::after {
   content: '';
   background-image: url(imgs/scanline1.png);
-  background-size: 4px;
+  background-size: 3.5px;
   background-blend-mode: hue;
-  opacity: .2;
+  opacity: .35;
   top: 0px;
   left: 0px;
   bottom: 0px;
   right: 0px;
   position: absolute;
   z-index: 2000;
+  pointer-events: none;
 }
 #textmode_wrap::before {
   content: '';
@@ -351,18 +354,19 @@ body {
   right: -32px;
   position: absolute;
   z-index: 4000;
+  pointer-events: none;
 }
 #textmode_screen {
   width: 40ch;
   min-width: 40ch;
   height: 25ch;
   min-height: 25ch;
-  padding: 2px;
-  background: #20398d;
-  color: #6076c5;
+  padding: 0px;
+  background: #0000AA;
+  color: #0088FF;
   white-space: normal;
-  font-size: 24px;
-  line-height: 1;
+  font-size: 22px;
+  line-height: 1.05;
   text-transform: uppercase;
   word-break: break-all;
   box-sizing: content-box;
@@ -370,15 +374,22 @@ body {
 #textmode_screen.capsMode {
   text-transform: none;
 }
-#textmode_screen .inverted {
-  color: #20398d;
-  background: #6076c5;
-}
 #textmode_screen ul {
   margin: 0;
   padding: 0;
 }
 #textmode_screen ul li {
+  display: inline-block;
+}
+#textmode_screen ul li.inverted {
+  color: #0000AA;
+  background: #0088FF;
+}
+#textmode_screen ul li:hover {
+  font-size: 0;
+}
+#textmode_screen ul li:hover::before {
+  font-size: 22px;
   display: inline-block;
 }
 

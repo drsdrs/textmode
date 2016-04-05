@@ -1,27 +1,34 @@
 @import 'font.less';
+@import 'c64colors.less';
 @import 'reset.less';
+
+@defaultBg: @c64_6;
+@defaultColor: @c64_e;
 
 html, body {
   height: 100%;
+  width: 100%;
   overflow: hidden;
+
+  cursor: none;
 }
 
 #textmode_wrap {
-  background: #6076c5;
+  background: @defaultColor;
   font-family: 'c64';
-  text-rendering: geometricPrecision;
   &::after {
     content: '';
     background-image: url(imgs/scanline1.png);
-    background-size: 4px;
+    background-size: 3.5px;
     background-blend-mode: hue;
-    opacity: .2;
+    opacity: .35;
     top: 0px;
     left: 0px;
     bottom: 0px;
     right: 0px;
     position: absolute;
     z-index: 2000;
+    pointer-events: none;
   }
   &::before {
     content: '';
@@ -34,31 +41,40 @@ html, body {
     right: -32px;
     position: absolute;
     z-index: 4000;
+    pointer-events: none;
   }
 }
 
 #textmode_screen {
   width: 40ch; min-width: 40ch;
   height: 25ch; min-height: 25ch;
-  padding: 2px;
-  background: #20398d;
-  color: #6076c5;
+  padding: 0px;
+  background: @defaultBg;
+  color: @defaultColor;
   white-space: normal;
-  font-size: 24px;
-  line-height: 1;
+  font-size: 22px;
+  line-height: 1.05;
   text-transform: uppercase;
   word-break: break-all;
   box-sizing: content-box;
   &.capsMode { text-transform: none; }
-  .inverted {
-    color: #20398d;
-    background: #6076c5;
-  }
   ul {
     margin: 0;
     padding: 0;
     li {
       display: inline-block;
+      &.inverted {
+        color: @defaultBg;
+        background: @defaultColor;
+      }
+      &:hover {
+        font-size: 0;
+        &::before {
+          font-size: 22px;
+          display: inline-block;
+          //content: '\e0a1'
+        }
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 (function() {
-  var Textmode, centerScreen, init,
+  var Textmode, centerScreen, getStyle, init,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   (function() {
@@ -59,7 +59,6 @@
     };
 
     Textmode.prototype.keydown = function(e) {
-      console.log(e);
       if (e.keyCode === 8) {
         e.preventDefault();
         this.delChar();
@@ -79,12 +78,14 @@
     };
 
     Textmode.prototype.keypress = function(e) {
+      var charCode;
       if (e.keyCode === 13) {
-        return this.newLine();
-      } else if (e.keyCode === 32) {
-        return this.placeChar('&nbsp');
+        return this.getLine();
+      } else if ((e.keyCode || e.charCode) === 32) {
+        return this.putChar('&nbsp;');
       } else {
-        return this.placeChar(String.fromCharCode(e.keyCode));
+        charCode = e.keyCode === 0 ? e.charCode : e.keyCode;
+        return this.putChar(String.fromCharCode(charCode));
       }
     };
 
@@ -97,7 +98,7 @@
       this.write('  **** saylermorph 64 basic v0.1 ****\n');
       this.write('\n');
       this.write(' 64k ram system 38911 basic bytes free\n');
-      return this.write('ready.\n');
+      return this.write('\nready.\n');
     };
 
     Textmode.prototype.initScreen = function() {
@@ -107,7 +108,7 @@
         rowEl = document.createElement('ul');
         for (x = j = 0, ref1 = this.SCREENSIZE.w; 0 <= ref1 ? j < ref1 : j > ref1; x = 0 <= ref1 ? ++j : --j) {
           cellEl = document.createElement('li');
-          cellEl.innerHTML = '&nbsp';
+          cellEl.innerHTML = '&nbsp;';
           rowEl.appendChild(cellEl);
         }
         results.push(this.el.appendChild(rowEl));
@@ -138,8 +139,58 @@
       return this.getCell().className = 'inverted';
     };
 
+    Textmode.prototype.cmdInterpreter = function(cmd) {
+      var interval, len, rules;
+      interval = null;
+      if (cmd.trim().length !== 0) {
+        if (cmd.split('clear').length > 1) {
+          this.clearScreen();
+        } else if (cmd.split('reset').length > 1) {
+          this.clearScreen();
+          this.welcomeMsg();
+        } else if (cmd.split('help').length > 1) {
+          this.write('\n\ncall 0900-drs-will-do-it\nready.\n');
+        } else if (cmd.split('load').length > 1) {
+          this.write('\n\npress play on tape\nloading\nready.\n');
+        } else if (cmd.split('run').length > 1) {
+          rules = '1. A robot may not injure a human being or, through inaction, allow a human being to come to harm.\n\n2. A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.\n\n3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nready.\n';
+          len = 0;
+          this.clearScreen();
+          interval = setInterval((function(_this) {
+            return function() {
+              _this.write(rules[len]);
+              if (len < rules.length - 1) {
+                return len++;
+              } else {
+                return clearInterval(interval);
+              }
+            };
+          })(this), 50);
+        } else {
+          this.write('\n\n?syntax error\nready.\n');
+        }
+        return false;
+      } else {
+        return true;
+      }
+    };
+
     Textmode.prototype.getCell = function() {
       return this.el.childNodes[this.cursor.y].childNodes[this.cursor.x];
+    };
+
+    Textmode.prototype.getLine = function() {
+      var char, child, i, len1, lineText, ref;
+      lineText = '';
+      ref = this.el.childNodes[this.cursor.y].childNodes;
+      for (i = 0, len1 = ref.length; i < len1; i++) {
+        child = ref[i];
+        char = child.innerHTML;
+        lineText += char === '&nbsp;' ? ' ' : char;
+      }
+      if (this.cmdInterpreter(lineText.toLowerCase())) {
+        return this.newLine();
+      }
     };
 
     Textmode.prototype.blinkCursor = function() {
@@ -151,32 +202,56 @@
       return this.cursor.blink = !this.cursor.blink;
     };
 
-    Textmode.prototype.placeChar = function(char) {
+    Textmode.prototype.putChar = function(char) {
       this.getCell().innerHTML = char;
       return this.checkCursor(this.cursor.x + 1);
     };
 
     Textmode.prototype.delChar = function() {
       this.checkCursor(this.cursor.x - 1);
-      return this.getCell().innerHTML = '&nbsp';
+      return this.getCell().innerHTML = '&nbsp;';
     };
 
     Textmode.prototype.newLine = function() {
       this.checkCursor(0, this.cursor.y + 1);
+      this.getCell().className = 'inverted';
+      return this.cursor.x = 0;
+    };
+
+    Textmode.prototype.clearScreen = function() {
+      var cell, i, j, len1, len2, line, ref, ref1;
+      this.getCell().className = '';
+      this.cursor = {
+        x: 0,
+        y: 0,
+        blink: false
+      };
+      ref = this.el.childNodes;
+      for (i = 0, len1 = ref.length; i < len1; i++) {
+        line = ref[i];
+        ref1 = line.childNodes;
+        for (j = 0, len2 = ref1.length; j < len2; j++) {
+          cell = ref1[j];
+          cell.innerHTML = '&nbsp;';
+        }
+      }
       return this.getCell().className = 'inverted';
     };
 
+    Textmode.prototype.setColor = function() {
+      return this.getCell().className = 'fgColor.0 bgColor.3';
+    };
+
     Textmode.prototype.write = function(text) {
-      var char, i, len, results;
+      var char, i, len1, results;
       results = [];
-      for (i = 0, len = text.length; i < len; i++) {
+      for (i = 0, len1 = text.length; i < len1; i++) {
         char = text[i];
         if (char === '\n') {
-          this.newLine();
-        } else if (char === ' ') {
-          char = '&nbsp';
+          results.push(this.newLine());
+        } else {
+          results.push(this.putChar(char === ' ' ? char = '&nbsp;' : char));
         }
-        results.push(this.placeChar(char));
       }
       return results;
     };
@@ -197,19 +272,105 @@
     parent.height = window.innerHeight;
     paddingLeft = (parent.offsetWidth - child.offsetWidth) / 2;
     paddingTop = (parent.height - child.offsetHeight) / 2;
-    return parent.style.padding = paddingTop + 'px ' + paddingLeft + 'px';
+    if (paddingTop < 5 || paddingLeft < 5) {
+      return -1;
+    } else if ((paddingTop > child.offsetHeight / 3) && (paddingLeft > child.offsetWidth / 3)) {
+      return 1;
+    } else {
+      parent.style.padding = paddingTop + 'px ' + paddingLeft + 'px';
+      return 0;
+    }
+  };
+
+  getStyle = function(className) {
+    var classes, x;
+    classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
+    x = 0;
+    while (x < classes.length) {
+      if (classes[x].selectorText === className) {
+        return classes[x].style;
+      }
+      x++;
+    }
   };
 
   init = function() {
-    var centerScreenFunct, screenEl, screenWrapEl, tm;
+    var activeCharCode, activeLiEl, adjustFont, centerScreenFunct, fontSize, iconPos, mouseWheelHandler, resizeFont, screenEl, screenWrapEl, setIcon, styleBackgroundSize, styleHoverChar, tm;
     screenEl = document.getElementById('textmode_screen');
     screenWrapEl = document.getElementById('textmode_wrap');
+    styleHoverChar = document.createElement("style");
+    styleBackgroundSize = document.createElement("style");
     tm = new Textmode(screenEl);
+    styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before { content: "A" }';
+    iconPos = 0;
+    fontSize = 25;
+    activeCharCode = String.fromCharCode(0xe0a9);
+    activeLiEl = null;
+    mouseWheelHandler = function(e) {
+      var charCodeString, delta;
+      e = window.event || e;
+      delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
+      iconPos += delta;
+      iconPos = iconPos < 0 ? 95 : iconPos > 94 ? 0 : iconPos;
+      charCodeString = "e0" + (0xa0 + iconPos).toString(16);
+      activeCharCode = String.fromCharCode(parseInt(charCodeString, 16));
+      return setIcon();
+    };
+    setIcon = function() {
+      return styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before {\n content: "' + activeCharCode + '";\n }';
+    };
+    setIcon();
     centerScreenFunct = function() {
       return centerScreen(screenWrapEl, screenEl);
     };
-    centerScreenFunct();
-    return window.addEventListener('resize', centerScreenFunct);
+    window.addEventListener('resize', function() {
+      centerScreenFunct();
+      return adjustFont();
+    });
+    screenEl.addEventListener('mouseover', function(e) {
+      if (e.target.tagName.toLowerCase() === 'li') {
+        return activeLiEl = e.target;
+      }
+    });
+    screenEl.addEventListener('mousewheel', mouseWheelHandler);
+    screenEl.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      activeCharCode = activeLiEl.innerHTML;
+      if (activeCharCode === "&nbsp;") {
+        activeCharCode = String.fromCharCode(0xa0);
+      }
+      setIcon();
+      return false;
+    });
+    screenEl.addEventListener('click', function() {
+      if (activeLiEl != null) {
+        return activeLiEl.innerHTML = activeCharCode;
+      }
+    });
+    resizeFont = function(amount) {
+      fontSize += amount;
+      screenEl.style.fontSize = (fontSize + amount) + 'px';
+      return styleBackgroundSize.innerHTML = '#textmode_wrap::after { background-size: ' + (fontSize * 0.175) + 'px }';
+    };
+    adjustFont = function() {
+      var cnt, resizeRes;
+      resizeRes = centerScreenFunct();
+      cnt = 0;
+      while (resizeRes !== 0) {
+        resizeRes = centerScreenFunct();
+        resizeFont(resizeRes);
+        cnt++;
+        if ((cnt++) > 120) {
+          resizeRes = 0;
+          alert('problem detected in adjustFont Function');
+        }
+      }
+      return centerScreenFunct();
+    };
+    adjustFont();
+    window.reload;
+    document.head.appendChild(styleHoverChar);
+    return document.head.appendChild(styleBackgroundSize);
   };
 
   window.onload = init;

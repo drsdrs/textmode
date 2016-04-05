@@ -10,7 +10,6 @@ class Textmode
   time: 0 # count every animation frame
   cursor: x:0, y:0, blink:true
   keydown: (e)=>
-    console.log e
     if e.keyCode==8 # BACKSPACE
       e.preventDefault()
       @delChar()
@@ -21,10 +20,11 @@ class Textmode
     else if e.keyCode==40 then @checkCursor null, @cursor.y+1 # TOP ARROW
     else if e.keyCode==38 then @checkCursor null, @cursor.y-1 # BOTTOM ARROW
   keypress: (e)=>
-    if e.keyCode==13 then @newLine() # ENTER
-    else if e.keyCode==32 then @placeChar '&nbsp' # SPACE
+    if e.keyCode==13 then @getLine() # ENTER
+    else if (e.keyCode||e.charCode)==32 then @putChar '&nbsp;' # SPACE
     else
-      @placeChar String.fromCharCode(e.keyCode)
+      charCode = if e.keyCode==0 then e.charCode else e.keyCode
+      @putChar String.fromCharCode charCode
   switchCaps: ->
     @el.className = if @el.className!='capsMode' then 'capsMode' else ''
   welcomeMsg: ->
@@ -32,13 +32,13 @@ class Textmode
     @write '  **** saylermorph 64 basic v0.1 ****\n'
     @write '\n'
     @write ' 64k ram system 38911 basic bytes free\n'
-    @write 'ready.\n'
+    @write '\nready.\n'
   initScreen: ->
     for y in [0...@SCREENSIZE.h]
       rowEl = document.createElement 'ul'
       for x in [0...@SCREENSIZE.w]
         cellEl = document.createElement 'li'
-        cellEl.innerHTML = '&nbsp'
+        cellEl.innerHTML = '&nbsp;'
         rowEl.appendChild cellEl
       @el.appendChild rowEl
 
@@ -59,26 +59,64 @@ class Textmode
 
     @getCell().className = 'inverted'
 
+  cmdInterpreter: (cmd)->
+    interval = null
+    if cmd.trim().length!=0
+      if cmd.split('clear').length>1 then @clearScreen()
+      else if cmd.split('reset').length>1 then @clearScreen();@welcomeMsg()
+      else if cmd.split('help').length>1 then @write '\n\ncall 0900-drs-will-do-it\nready.\n'
+      else if cmd.split('load').length>1 then @write '\n\npress play on tape\nloading\nready.\n'
+      else if cmd.split('run').length>1
+        rules = '1. A robot may not injure a human being or, through inaction, allow a human being to come to harm.\n\n2. A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.\n\n3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nready.\n'
+        len = 0
+        @clearScreen()
+        interval = setInterval ()=>
+          @write rules[len]
+          if len<rules.length-1 then len++
+          else clearInterval interval
+        , 50
+      else @write '\n\n?syntax error\nready.\n'
+      return false
+    else return true
   getCell: -> @el.childNodes[@cursor.y].childNodes[@cursor.x]
+  getLine: ->
+    lineText = ''
+    for child in @el.childNodes[@cursor.y].childNodes
+      char = child.innerHTML
+      lineText += if char=='&nbsp;' then ' ' else char
+    if @cmdInterpreter lineText.toLowerCase() then @newLine()
+
   blinkCursor: ->
     if @cursor.blink then @getCell().className = 'inverted'
     else @getCell().className = ''
     @cursor.blink = !@cursor.blink
-  placeChar: (char)->
+  putChar: (char)->
     @getCell().innerHTML = char
     @checkCursor @cursor.x+1
   delChar: ()->
     @checkCursor @cursor.x-1
-    @getCell().innerHTML = '&nbsp'
+    @getCell().innerHTML = '&nbsp;'
   newLine: ()=>
     @checkCursor 0, @cursor.y+1
-    @getCell().className = 'invloaderted'
+    @getCell().className = 'inverted'
+    @cursor.x = 0
+  clearScreen: ->
+    @getCell().className = ''
+    @cursor = x:0, y:0, blink:false
+    for line in @el.childNodes
+      for cell in line.childNodes
+        cell.innerHTML = '&nbsp;'
+    @getCell().className = 'inverted'
+  setColor: ->
+    @getCell().className = 'fgColor.0 bgColor.3'
+
+
 
   write: (text)->
     for char in text
       if char=='\n' then @newLine()
-      else if char==' ' then char = '&nbsp'
-      @placeChar char
+      else
+        @putChar if char==' ' then char = '&nbsp;' else char
 
   cycle: =>
     if (@time++)%35==0 then @blinkCursor()
@@ -91,23 +129,98 @@ centerScreen = (parent, child)->
   parent.height = window.innerHeight
   paddingLeft = (parent.offsetWidth - child.offsetWidth)/2
   paddingTop = (parent.height - child.offsetHeight)/2
-  parent.style.padding = paddingTop+'px '+paddingLeft+'px'
+  if paddingTop<5||paddingLeft<5
+    return -1
+  else if (paddingTop > child.offsetHeight/3) && (paddingLeft > child.offsetWidth/3)
+    return 1
+  else
+    parent.style.padding = paddingTop+'px '+paddingLeft+'px'
+    return 0
 
+
+getStyle = (className) ->
+  classes = document.styleSheets[0].rules or document.styleSheets[0].cssRules
+  x = 0
+  while x < classes.length
+    if classes[x].selectorText == className
+      return classes[x].style
+    x++
 
 
 init = ->
   screenEl = document.getElementById 'textmode_screen'
   screenWrapEl = document.getElementById 'textmode_wrap'
+  styleHoverChar = document.createElement("style")
+  styleBackgroundSize = document.createElement("style")
 
 
   tm = new Textmode screenEl
 
 
+  styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before { content: "A" }'
+
+  iconPos = 0
+  fontSize = 25
+  activeCharCode = String.fromCharCode 0xe0a9
+  activeLiEl = null
+  mouseWheelHandler = (e)->
+    e = window.event || e
+    delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)))
+    iconPos += delta
+    iconPos = if iconPos<0 then 95 else if iconPos>94 then 0 else iconPos
+    charCodeString = "e0"+(0xa0+iconPos).toString(16)
+    activeCharCode = String.fromCharCode parseInt(charCodeString, 16)
+    setIcon()
+
+
+  setIcon = ()->
+    styleHoverChar.innerHTML =
+      '#textmode_screen ul li:hover::before {\n
+        content: "'+activeCharCode+'";\n
+      }'
+
+  setIcon()
+
   centerScreenFunct = -> centerScreen screenWrapEl, screenEl
-  centerScreenFunct()
-
-  window.addEventListener 'resize', centerScreenFunct
 
 
+
+
+  window.addEventListener 'resize', ->
+    centerScreenFunct()
+    adjustFont()
+  screenEl.addEventListener 'mouseover', (e)->
+    if e.target.tagName.toLowerCase()=='li'
+      activeLiEl = e.target
+  screenEl.addEventListener 'mousewheel', mouseWheelHandler
+  screenEl.addEventListener 'contextmenu', (e)->
+    e.preventDefault()
+    activeCharCode = activeLiEl.innerHTML
+    if activeCharCode=="&nbsp;" then activeCharCode = String.fromCharCode 0xa0
+    setIcon()
+    false
+  screenEl.addEventListener 'click', ->
+    if activeLiEl? then activeLiEl.innerHTML = activeCharCode
+
+  resizeFont = (amount)->
+    fontSize += amount
+    screenEl.style.fontSize = (fontSize+amount)+'px'
+    styleBackgroundSize.innerHTML = '#textmode_wrap::after { background-size: '+(fontSize*0.175)+'px }'
+
+  adjustFont = ()->
+    resizeRes = centerScreenFunct()
+    cnt = 0
+    while resizeRes!=0
+      resizeRes = centerScreenFunct()
+      resizeFont resizeRes
+      cnt++
+      if (cnt++)>120 then resizeRes = 0;alert 'problem detected in adjustFont Function'
+    centerScreenFunct()
+
+  adjustFont()
+  window.reload
+
+  document.head.appendChild styleHoverChar
+  document.head.appendChild styleBackgroundSize
 
 window.onload = init
