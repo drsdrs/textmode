@@ -274,7 +274,7 @@
     paddingTop = (parent.height - child.offsetHeight) / 2;
     if (paddingTop < 5 || paddingLeft < 5) {
       return -1;
-    } else if ((paddingTop > child.offsetHeight / 3) && (paddingLeft > child.offsetWidth / 3)) {
+    } else if ((paddingTop > child.offsetHeight / 5) && (paddingLeft > child.offsetWidth / 5)) {
       return 1;
     } else {
       parent.style.padding = paddingTop + 'px ' + paddingLeft + 'px';
@@ -301,7 +301,6 @@
     styleHoverChar = document.createElement("style");
     styleBackgroundSize = document.createElement("style");
     tm = new Textmode(screenEl);
-    styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before { content: "A" }';
     iconPos = 0;
     fontSize = 25;
     activeCharCode = String.fromCharCode(0xe0a9);
@@ -317,15 +316,15 @@
       return setIcon();
     };
     setIcon = function() {
-      return styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before {\n content: "' + activeCharCode + '";\n }';
+      return styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before {\n content: "' + activeCharCode + '";\n font-size: ' + fontSize + 'px;\n }';
     };
-    setIcon();
     centerScreenFunct = function() {
       return centerScreen(screenWrapEl, screenEl);
     };
     window.addEventListener('resize', function() {
       centerScreenFunct();
-      return adjustFont();
+      adjustFont();
+      return setIcon();
     });
     screenEl.addEventListener('mouseover', function(e) {
       if (e.target.tagName.toLowerCase() === 'li') {
@@ -365,10 +364,11 @@
           alert('problem detected in adjustFont Function');
         }
       }
+      resizeFont(0);
       return centerScreenFunct();
     };
     adjustFont();
-    window.reload;
+    setIcon();
     document.head.appendChild(styleHoverChar);
     return document.head.appendChild(styleBackgroundSize);
   };

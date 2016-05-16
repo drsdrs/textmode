@@ -161,7 +161,7 @@ centerScreen = (parent, child)->
   paddingTop = (parent.height - child.offsetHeight)/2
   if paddingTop<5||paddingLeft<5
     return -1
-  else if (paddingTop > child.offsetHeight/3) && (paddingLeft > child.offsetWidth/3)
+  else if (paddingTop > child.offsetHeight/5) && (paddingLeft > child.offsetWidth/5)
     return 1
   else
     parent.style.padding = paddingTop+'px '+paddingLeft+'px'
@@ -187,7 +187,6 @@ init = ->
   tm = new Textmode screenEl
 
 
-  styleHoverChar.innerHTML = '#textmode_screen ul li:hover::before { content: "A" }'
 
   iconPos = 0
   fontSize = 25
@@ -207,9 +206,9 @@ init = ->
     styleHoverChar.innerHTML =
       '#textmode_screen ul li:hover::before {\n
         content: "'+activeCharCode+'";\n
+        font-size: '+fontSize+'px;\n
       }'
 
-  setIcon()
 
   centerScreenFunct = -> centerScreen screenWrapEl, screenEl
 
@@ -219,6 +218,7 @@ init = ->
   window.addEventListener 'resize', ->
     centerScreenFunct()
     adjustFont()
+    setIcon()
   screenEl.addEventListener 'mouseover', (e)->
     if e.target.tagName.toLowerCase()=='li'
       activeLiEl = e.target
@@ -245,10 +245,12 @@ init = ->
       resizeFont resizeRes
       cnt++
       if (cnt++)>120 then resizeRes = 0;alert 'problem detected in adjustFont Function'
+    resizeFont(0)
     centerScreenFunct()
 
   adjustFont()
-  window.reload
+  setIcon()
+
 
   document.head.appendChild styleHoverChar
   document.head.appendChild styleBackgroundSize
