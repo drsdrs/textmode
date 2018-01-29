@@ -10,8 +10,8 @@ to build and watch project
 localhost:8080 for preview
 
 
-### type
+type
 ```
 help
 ```
-### in website for help
+inside website for help
