@@ -7,6 +7,7 @@ type
 grunt
 ```
 to build and watch project
+
 localhost:8080 for preview
 
 
