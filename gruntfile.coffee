@@ -58,7 +58,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-less'
   grunt.loadNpmTasks 'grunt-coffeelint'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
-  grunt.loadNpmTasks 'grunt-livereload'
   grunt.loadNpmTasks 'grunt-contrib-connect'
 
   # Default task(s).

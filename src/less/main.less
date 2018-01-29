@@ -5,15 +5,48 @@
 @defaultBg: @c64_6;
 @defaultColor: @c64_e;
 
+.bg_0 {		background: @c64_0; }
+.fg_0 {		color: @c64_0; }
+.bg_1 {		background: @c64_1; }
+.fg_1 {		color: @c64_1; }
+.bg_2 {		background: @c64_2; }
+.fg_2 {		color: @c64_2; }
+.bg_3 {		background: @c64_3; }
+.fg_3 {		color: @c64_3; }
+.bg_4 {		background: @c64_4; }
+.fg_4 {		color: @c64_4; }
+.bg_5 {		background: @c64_5; }
+.fg_5 {		color: @c64_5; }
+.bg_6 {		background: @c64_6; }
+.fg_6 {		color: @c64_6; }
+.bg_7 {		background: @c64_7; }
+.fg_7 {		color: @c64_7; }
+.bg_8 {		background: @c64_8; }
+.fg_8 {		color: @c64_8; }
+.bg_9 {		background: @c64_9; }
+.fg_9 {		color: @c64_9; }
+.bg_10 {	background: @c64_a; }
+.fg_10 {	color: @c64_a; }
+.bg_11 {	background: @c64_b; }
+.fg_11 {	color: @c64_b; }
+.bg_12 {	background: @c64_c; }
+.fg_12 {	color: @c64_c; }
+.bg_13 {	background: @c64_d; }
+.fg_13 {	color: @c64_d; }
+.bg_14 {	background: @c64_e; }
+.fg_14 {	color: @c64_e; }
+.bg_15 {	background: @c64_f; }
+.fg_15 {	color: @c64_f; }
+
 html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
 
-  cursor: none;
 }
 
 #textmode_wrap {
+
   background: @defaultColor;
   font-family: 'c64';
   &::after {
@@ -46,8 +79,12 @@ html, body {
 }
 
 #textmode_screen {
-  width: 40ch; min-width: 40ch;
-  height: 25ch; min-height: 25ch;
+  cursor: none;
+
+  width: 40ch;
+  min-width: 40ch;
+  height: 25.5ch;
+  min-height: 25ch;
   padding: 0px;
   background: @defaultBg;
   color: @defaultColor;
@@ -69,6 +106,7 @@ html, body {
       }
       &:hover {
         font-size: 0;
+        background: @c64_0;
         &::before {
           font-size: 22px;
           display: inline-block;

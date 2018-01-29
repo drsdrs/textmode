@@ -9,17 +9,16 @@
   "author": "drs",
   "license": "ISC",
   "dependencies": {
-    "grunt": "^0.4.5",
-    "grunt-coffeelint": "0.0.15",
-    "grunt-contrib-coffee": "^1.0.0",
-    "grunt-contrib-less": "^1.2.0",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-livereload": "^0.1.3"
+    "grunt": "latest",
+    "grunt-coffeelint": "latest",
+    "grunt-contrib-coffee": "latest",
+    "grunt-contrib-less": "latest",
+    "grunt-contrib-watch": "latest"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-connect": "^1.0.1",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-serve": "^0.1.6"
+    "grunt": "latest",
+    "grunt-contrib-connect": "latest",
+    "grunt-contrib-copy": "latest",
+    "grunt-serve": "latest"
   }
 }

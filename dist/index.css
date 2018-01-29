@@ -318,12 +318,107 @@ textarea {
     page-break-after: avoid;
   }
 }
+.bg_0 {
+  background: #000000;
+}
+.fg_0 {
+  color: #000000;
+}
+.bg_1 {
+  background: #f8f8f8;
+}
+.fg_1 {
+  color: #f8f8f8;
+}
+.bg_2 {
+  background: #880000;
+}
+.fg_2 {
+  color: #880000;
+}
+.bg_3 {
+  background: #AAFFEE;
+}
+.fg_3 {
+  color: #AAFFEE;
+}
+.bg_4 {
+  background: #CC44CC;
+}
+.fg_4 {
+  color: #CC44CC;
+}
+.bg_5 {
+  background: #00CC55;
+}
+.fg_5 {
+  color: #00CC55;
+}
+.bg_6 {
+  background: #0000AA;
+}
+.fg_6 {
+  color: #0000AA;
+}
+.bg_7 {
+  background: #EEEE77;
+}
+.fg_7 {
+  color: #EEEE77;
+}
+.bg_8 {
+  background: #DD8855;
+}
+.fg_8 {
+  color: #DD8855;
+}
+.bg_9 {
+  background: #664400;
+}
+.fg_9 {
+  color: #664400;
+}
+.bg_10 {
+  background: #FF7777;
+}
+.fg_10 {
+  color: #FF7777;
+}
+.bg_11 {
+  background: #333333;
+}
+.fg_11 {
+  color: #333333;
+}
+.bg_12 {
+  background: #777777;
+}
+.fg_12 {
+  color: #777777;
+}
+.bg_13 {
+  background: #AAFF66;
+}
+.fg_13 {
+  color: #AAFF66;
+}
+.bg_14 {
+  background: #0088FF;
+}
+.fg_14 {
+  color: #0088FF;
+}
+.bg_15 {
+  background: #BBBBBB;
+}
+.fg_15 {
+  color: #BBBBBB;
+}
 html,
 body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  cursor: none;
 }
 #textmode_wrap {
   background: #0088FF;
@@ -357,9 +452,10 @@ body {
   pointer-events: none;
 }
 #textmode_screen {
+  cursor: none;
   width: 40ch;
   min-width: 40ch;
-  height: 25ch;
+  height: 25.5ch;
   min-height: 25ch;
   padding: 0px;
   background: #0000AA;
@@ -387,6 +483,7 @@ body {
 }
 #textmode_screen ul li:hover {
   font-size: 0;
+  background: #000000;
 }
 #textmode_screen ul li:hover::before {
   font-size: 22px;
