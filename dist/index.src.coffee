@@ -67,7 +67,7 @@ init = ->
     parent.height = window.innerHeight
     paddingLeft = (parent.offsetWidth - child.offsetWidth)/2
     paddingTop = (parent.height - child.offsetHeight)/2
-    if paddingTop<5||paddingLeft<5
+    if paddingTop<2||paddingLeft<2
       return -1
     else if (paddingTop > child.offsetHeight/5) && (paddingLeft > child.offsetWidth/5)
       return 1
@@ -117,16 +117,19 @@ init = ->
       resizeRes = centerScreenFunct()
       resizeFont resizeRes
       cnt++
-      if (cnt++)>120 then resizeRes = 0;alert 'problem detected in adjustFont Function'
+      if (cnt++)>120 then resizeRes = 0#;alert 'problem detected in adjustFont Function'
     resizeFont(0)
     centerScreenFunct()
 
-  adjustFont()
-  setIcon()
+
 
 
   document.head.appendChild styleHoverChar
   document.head.appendChild styleBackgroundSize
+
+  centerScreenFunct()
+  adjustFont()
+  setIcon()
 
 window.onload = init
 
@@ -159,9 +162,7 @@ class Textmode
       @putChar String.fromCharCode charCode
   switchCaps: ->
     @el.className = if @el.className!='capsMode' then 'capsMode' else ''
-  welcomeMsg: ->
-    @checkCursor(0, 0)
-    @writeDelayed '\n     **** saylermorph.com v0.1 ****\n\n 64k ram system 38911 basic bytes free\n\nready.\n'
+  welcomeMsg: -> @writeDelayed '\n     **** saylermorph.com v0.1 ****\n\n 64k ram system 38911 basic bytes free\n\nready.\n'
   initScreen: ->
     for y in [0...@SCREENSIZE.h]
       rowEl = document.createElement 'ul'
@@ -172,6 +173,7 @@ class Textmode
       @el.appendChild rowEl
 
   checkCursor: (x,y)->
+    @cursor.blink = false
     @getCell().className = ''
     @cursor.x = x if x?
     @cursor.y = y if y?
@@ -189,8 +191,8 @@ class Textmode
 
     else if @cursor.y==-1
       @cursor.y = @SCREENSIZE.h-1
-
-    @getCell().className = 'inverted'
+    @cursor.blink = true
+    #@getCell().className = 'inverted'
 
   cmdInterpreter: (cmd)->
     interval = null
@@ -198,14 +200,16 @@ class Textmode
     if cmd.split('clear').length>1
       @clearScreen()
     else if cmd.split('list').length>1
-      @writeDelayed '0\n1\n2\n3\n4\n5\nready.\n'
+      @writeDelayed programmListing
     else if cmd.split('reset').length>1
       @clearScreen()
       @welcomeMsg()
     else if cmd.split('help').length>1
       @writeDelayed '\n\ncall 0900-drs-will-do-it\nready.\n'
     else if cmd.split('load').length>1
-      @writeDelayed '\n\npress play on tape\nloading\nready.\n'
+      @writeDelayed '\n\npress play on tape\nloading\n'
+      @writeDelayed 'ready.\n'
+
     else if cmd.split('run').length>1
       @clearScreen()
       @writeDelayed '
@@ -237,9 +241,11 @@ class Textmode
     @cursor.blink = !@cursor.blink
 
   putChar: (char)->
-    @checkCursor null, null
-    @getCell().innerHTML = char
+    @checkCursor()
+    cell = @getCell()
+    cell.innerHTML = char
     @checkCursor @cursor.x+1, null
+
 
   delChar: ()->
     @checkCursor @cursor.x-1, null
@@ -271,9 +277,6 @@ class Textmode
       original = @el.childNodes[i]
       original.innerHTML = replacement
 
-      #replacement.parentNode.replaceChild replacement, original
-
-
   textToWriteDelayed: ""
 
   writeDelayed: (text)-> @textToWriteDelayed += text
@@ -290,5 +293,16 @@ class Textmode
 
   cycle: =>
     if (@time++)%35==0 then @blinkCursor()
-    if (@time)%1==0 && @textToWriteDelayed.length>0 then @nextDelayedText()
+    if @textToWriteDelayed.length>0 then @nextDelayedText()
     requestAnimationFrame @cycle
+
+
+programmListing =
+  '0   "----- DISK LISTING ----"    1\n'+
+  '6   "HELP"                       PRG\n'+
+  '12  "DRAW"                       PRG\n'+
+  '1   "ROBOT RULES"                PRG\n'+
+  '1   "ROBOT RULES"                PRG\n'+
+  '5   "CONTACT"                    PRG\n'+
+  '512 BLOCKS FREE.\n'+
+  'READY.\n'

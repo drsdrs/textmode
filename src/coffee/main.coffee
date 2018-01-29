@@ -37,7 +37,7 @@ init = ->
     parent.height = window.innerHeight
     paddingLeft = (parent.offsetWidth - child.offsetWidth)/2
     paddingTop = (parent.height - child.offsetHeight)/2
-    if paddingTop<5||paddingLeft<5
+    if paddingTop<2||paddingLeft<2
       return -1
     else if (paddingTop > child.offsetHeight/5) && (paddingLeft > child.offsetWidth/5)
       return 1
@@ -87,15 +87,18 @@ init = ->
       resizeRes = centerScreenFunct()
       resizeFont resizeRes
       cnt++
-      if (cnt++)>120 then resizeRes = 0;alert 'problem detected in adjustFont Function'
+      if (cnt++)>120 then resizeRes = 0#;alert 'problem detected in adjustFont Function'
     resizeFont(0)
     centerScreenFunct()
 
-  adjustFont()
-  setIcon()
+
 
 
   document.head.appendChild styleHoverChar
   document.head.appendChild styleBackgroundSize
+
+  centerScreenFunct()
+  adjustFont()
+  setIcon()
 
 window.onload = init

@@ -441,7 +441,7 @@ body {
 #textmode_wrap::before {
   content: '';
   border: 40px solid black;
-  border-radius: 80px;
+  border-radius: 50px;
   opacity: 1;
   top: -33px;
   left: -33px;
@@ -455,8 +455,6 @@ body {
   cursor: none;
   width: 40ch;
   min-width: 40ch;
-  height: 25.5ch;
-  min-height: 25ch;
   padding: 0px;
   background: #0000AA;
   color: #0088FF;

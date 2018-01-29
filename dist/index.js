@@ -1,7 +1,7 @@
 (function() {
   // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
   // MIT license
-  var Textmode, init;
+  var Textmode, init, programmListing;
 
   (function() {
     var lastTime, vendors, x;
@@ -64,7 +64,7 @@
       parent.height = window.innerHeight;
       paddingLeft = (parent.offsetWidth - child.offsetWidth) / 2;
       paddingTop = (parent.height - child.offsetHeight) / 2;
-      if (paddingTop < 5 || paddingLeft < 5) {
+      if (paddingTop < 2 || paddingLeft < 2) {
         return -1;
       } else if ((paddingTop > child.offsetHeight / 5) && (paddingLeft > child.offsetWidth / 5)) {
         return 1;
@@ -123,17 +123,17 @@
         resizeFont(resizeRes);
         cnt++;
         if ((cnt++) > 120) {
-          resizeRes = 0;
-          alert('problem detected in adjustFont Function');
+          resizeRes = 0; //;alert 'problem detected in adjustFont Function'
         }
       }
       resizeFont(0);
       return centerScreenFunct();
     };
-    adjustFont();
-    setIcon();
     document.head.appendChild(styleHoverChar);
-    return document.head.appendChild(styleBackgroundSize);
+    document.head.appendChild(styleBackgroundSize);
+    centerScreenFunct();
+    adjustFont();
+    return setIcon();
   };
 
   window.onload = init;
@@ -189,7 +189,6 @@
       }
 
       welcomeMsg() {
-        this.checkCursor(0, 0);
         return this.writeDelayed('\n     **** saylermorph.com v0.1 ****\n\n 64k ram system 38911 basic bytes free\n\nready.\n');
       }
 
@@ -209,6 +208,7 @@
       }
 
       checkCursor(x, y) {
+        this.cursor.blink = false;
         this.getCell().className = '';
         if (x != null) {
           this.cursor.x = x;
@@ -229,9 +229,10 @@
         } else if (this.cursor.y === -1) {
           this.cursor.y = this.SCREENSIZE.h - 1;
         }
-        return this.getCell().className = 'inverted';
+        return this.cursor.blink = true;
       }
 
+      //@getCell().className = 'inverted'
       cmdInterpreter(cmd) {
         var interval;
         interval = null;
@@ -241,14 +242,15 @@
         if (cmd.split('clear').length > 1) {
           this.clearScreen();
         } else if (cmd.split('list').length > 1) {
-          this.writeDelayed('0\n1\n2\n3\n4\n5\nready.\n');
+          this.writeDelayed(programmListing);
         } else if (cmd.split('reset').length > 1) {
           this.clearScreen();
           this.welcomeMsg();
         } else if (cmd.split('help').length > 1) {
           this.writeDelayed('\n\ncall 0900-drs-will-do-it\nready.\n');
         } else if (cmd.split('load').length > 1) {
-          this.writeDelayed('\n\npress play on tape\nloading\nready.\n');
+          this.writeDelayed('\n\npress play on tape\nloading\n');
+          this.writeDelayed('ready.\n');
         } else if (cmd.split('run').length > 1) {
           this.clearScreen();
           this.writeDelayed('1. A robot may not injure a human being\n   or, through inaction, allow a human \n   being to come to harm. \n\n2. A robot must obey the orders given \n   it by human beings except where such\n   orders would conflict with the First\n   Law. \n\n3. A robot must protect its own \n   existence as long as such protection\n   does not conflict with\n   the First or Second Laws \n\n\n\nready.\n');
@@ -287,8 +289,10 @@
       }
 
       putChar(char) {
-        this.checkCursor(null, null);
-        this.getCell().innerHTML = char;
+        var cell;
+        this.checkCursor();
+        cell = this.getCell();
+        cell.innerHTML = char;
         return this.checkCursor(this.cursor.x + 1, null);
       }
 
@@ -375,7 +379,7 @@
         if ((this.time++) % 35 === 0) {
           this.blinkCursor();
         }
-        if (this.time % 1 === 0 && this.textToWriteDelayed.length > 0) {
+        if (this.textToWriteDelayed.length > 0) {
           this.nextDelayedText();
         }
         return requestAnimationFrame(this.cycle);
@@ -396,12 +400,13 @@
       blink: true
     };
 
-    //replacement.parentNode.replaceChild replacement, original
     Textmode.prototype.textToWriteDelayed = "";
 
     return Textmode;
 
   }).call(this);
+
+  programmListing = '0   "----- DISK LISTING ----"    1\n' + '6   "HELP"                       PRG\n' + '12  "DRAW"                       PRG\n' + '1   "ROBOT RULES"                PRG\n' + '1   "ROBOT RULES"                PRG\n' + '5   "CONTACT"                    PRG\n' + '512 BLOCKS FREE.\n' + 'READY.\n';
 
 }).call(this);
 
